@@ -1,0 +1,44 @@
+{
+	"name": "my-app",
+	"version": "0.1.0",
+	"dependencies": {
+		"@material-ui/core": "^3.7.1",
+		"@material-ui/icons": "^3.0.1",
+		"@types/file-saver": "^2.0.0",
+		"@types/material-ui": "^0.21.5",
+		"@types/react-image-crop": "^3.0.1",
+		"file-saver": "^2.0.0",
+		"mobx": "^5.8.0",
+		"mobx-react": "^5.4.3",
+		"react": "^16.7.0",
+		"react-dom": "^16.7.0",
+		"react-image-crop": "^6.0.9"
+	},
+	"devDependencies": {
+		"@types/react": "^16.7.18",
+		"@types/react-dom": "^16.0.11",
+		"css-loader": "^2.1.0",
+		"extract-text-webpack-plugin": "^4.0.0-beta.0",
+		"lite-server": "^2.4.0",
+		"mobx-react-devtools": "^6.0.3",
+		"node-sass": "^4.11.0",
+		"raw-loader": "^1.0.0",
+		"sass-loader": "^7.1.0",
+		"source-map-loader": "^0.2.4",
+		"style-loader": "^0.23.1",
+		"ts-lint": "^4.5.1",
+		"ts-loader": "^5.3.2",
+		"typescript": "^3.2.2",
+		"uglify-js": "^3.4.9",
+		"uglifyjs-webpack-plugin": "^2.1.1",
+		"webpack": "^4.28.2",
+		"webpack-cli": "^3.1.2"
+	},
+	"scripts": {
+		"start": "bash scripts/start.sh",
+		"prod": "bash scripts/build-production.sh",
+		"lint": "bash scripts/lint.sh",
+		"serve": "bash scripts/serve.sh",
+		"dev": "bash scripts/build-development.sh"
+	}
+}
