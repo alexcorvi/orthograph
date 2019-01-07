@@ -99,8 +99,8 @@ export class CropImageModal extends React.Component<{
 								</Typography>
 								<br />
 								<Slider
-									min={-359}
-									max={359}
+									min={-179}
+									max={179}
 									value={this.rotation}
 									onChange={(e, v) => {
 										if (e && v) {
