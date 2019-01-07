@@ -68,7 +68,9 @@ export class CropImageModal extends React.Component<{
 									max={30}
 									value={this.zoom}
 									onChange={(e, v) => {
-										this.zoom = v;
+										if (e && v) {
+											this.zoom = v;
+										}
 									}}
 								/>
 								<br />
@@ -77,7 +79,9 @@ export class CropImageModal extends React.Component<{
 										<Switch
 											value={this.showGrid}
 											onChange={(e, v) => {
-												this.showGrid = v;
+												if (e && v) {
+													this.showGrid = v;
+												}
 											}}
 										/>
 									}
@@ -99,7 +103,7 @@ export class CropImageModal extends React.Component<{
 									max={359}
 									value={this.rotation}
 									onChange={(e, v) => {
-										if (v) {
+										if (e && v) {
 											this.rotation = v;
 										}
 									}}
