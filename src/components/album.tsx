@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {
 	AddCircle,
 	AddCircleOutline,
@@ -10,17 +10,10 @@ import {
 	LineStyle,
 	PlaylistAdd,
 	RemoveCircle
-	} from '@material-ui/icons';
-import { AddImage } from './add-image';
-import {
-	Album,
-	colors,
-	Graph,
-	graphTypes,
-	viewControl,
-	Visit
-	} from '../data';
-import { AlbumHeader } from './header';
+} from "@material-ui/icons";
+import { AddImage } from "./add-image";
+import { Album, colors, Graph, graphTypes, viewControl, Visit } from "../data";
+import { AlbumHeader } from "./header";
 import {
 	Button,
 	Dialog,
@@ -38,16 +31,14 @@ import {
 	Paper,
 	TextField,
 	Typography
-	} from '@material-ui/core';
-import { computed, observable } from 'mobx';
-import { CropImageModal } from './crop';
-import { observer } from 'mobx-react';
-import 'react-image-crop/dist/ReactCrop.css';
-import 'react-image-crop/lib/ReactCrop.scss';
+} from "@material-ui/core";
+import { computed, observable } from "mobx";
+import { CropImageModal } from "./crop";
+import { observer } from "mobx-react";
 
 @observer
 export class AlbumContents extends React.Component<{ album: Album }> {
-	@observable toCropSrc: string = '';
+	@observable toCropSrc: string = "";
 	@observable toCropVisitIndex: number = 0;
 	@observable toCropTypeIndex: number = 0;
 
@@ -73,15 +64,28 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 
 	render() {
 		return (
-			<div className="album-content-container" style={{ position: 'relative' }}>
-				<div style={{ overflowX: 'auto' }}>
+			<div
+				className="album-content-container"
+				style={{ position: "relative" }}
+			>
+				<div style={{ overflowX: "auto" }}>
 					<table className="album-content">
 						<thead>
 							<tr>
 								<th />
 								{graphTypes.map((type, i) => (
-									<th key={type} style={{ display: viewControl.showGraphs[i] ? undefined : 'none' }}>
-										<Typography style={{ color: '#fafafa' }} variant="overline">
+									<th
+										key={type}
+										style={{
+											display: viewControl.showGraphs[i]
+												? undefined
+												: "none"
+										}}
+									>
+										<Typography
+											style={{ color: "#fafafa" }}
+											variant="overline"
+										>
 											{type}
 										</Typography>
 									</th>
@@ -89,128 +93,204 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 							</tr>
 						</thead>
 						<tbody>
-							{this.props.album.visits.map((visit, visitIndex) => {
-								return (
-									<tr key={visitIndex}>
-										<td>
-											<Paper style={{ padding: 15 }}>
-												<Typography variant="overline" gutterBottom>
-													<TextField
-														label="Record #"
-														style={{ width: 100 }}
-														type="number"
-														variant="outlined"
-														margin="dense"
-														value={visitIndex + 1}
-														onChange={(e) => {
-															const val = Number(e.target.value) - 1;
-															if (isNaN(val)) {
-																return;
-															}
-															this.props.album.visits.splice(
-																val,
-																0,
-																this.props.album.visits.splice(visitIndex, 1)[0]
-															);
-														}}
-													/>
-													<Button
-														color="secondary"
-														onClick={() => {
-															this.props.album.visits.splice(visitIndex, 1);
-														}}
-														style={{ float: 'right' }}
+							{this.props.album.visits.map(
+								(visit, visitIndex) => {
+									return (
+										<tr key={visitIndex}>
+											<td>
+												<Paper style={{ padding: 15 }}>
+													<Typography
+														variant="overline"
+														gutterBottom
 													>
-														<DeleteForever fontSize="small" style={{ marginRight: 5 }} />
-														Delete
-													</Button>
-													{
 														<TextField
-															fullWidth
+															label="Record #"
+															style={{
+																width: 100
+															}}
+															type="number"
 															variant="outlined"
-															label="Date"
-															type="date"
 															margin="dense"
-															value={visit.date.toISOString().split('T')[0]}
-															onChange={(v) => {
-																if (v.target.value) {
-																	this.props.album.visits[visitIndex].date = new Date(
-																		v.target.value
-																	);
+															value={
+																visitIndex + 1
+															}
+															onChange={e => {
+																const val =
+																	Number(
+																		e.target
+																			.value
+																	) - 1;
+																if (
+																	isNaN(val)
+																) {
+																	return;
 																}
+																this.props.album.visits.splice(
+																	val,
+																	0,
+																	this.props.album.visits.splice(
+																		visitIndex,
+																		1
+																	)[0]
+																);
 															}}
 														/>
-													}
-												</Typography>
-												<TextField
-													fullWidth
-													variant="outlined"
-													margin="dense"
-													label="Comment"
-													value={visit.comment}
-													multiline
-													onChange={(e) =>
-														(this.props.album.visits[visitIndex].comment = e.target.value)}
-												/>
-												<br />
-											</Paper>
-										</td>
-										{graphTypes.map((type, typeIndex) => (
-											<td
-												key={type}
-												style={{
-													display: viewControl.showGraphs[typeIndex] ? undefined : 'none'
-												}}
-											>
-												{visit.graphs[typeIndex].source ? (
-													<div
-														style={{ width: viewControl.thumbnailSize, cursor: 'pointer' }}
-														onClick={() => {
-															this.toShowVisitIndex = visitIndex;
-															this.toShowTypeIndex = typeIndex;
+														<Button
+															color="secondary"
+															onClick={() => {
+																this.props.album.visits.splice(
+																	visitIndex,
+																	1
+																);
+															}}
+															style={{
+																float: "right"
+															}}
+														>
+															<DeleteForever
+																fontSize="small"
+																style={{
+																	marginRight: 5
+																}}
+															/>
+															Delete
+														</Button>
+														{
+															<TextField
+																fullWidth
+																variant="outlined"
+																label="Date"
+																type="date"
+																margin="dense"
+																value={
+																	visit.date
+																		.toISOString()
+																		.split(
+																			"T"
+																		)[0]
+																}
+																onChange={v => {
+																	if (
+																		v.target
+																			.value
+																	) {
+																		this.props.album.visits[
+																			visitIndex
+																		].date = new Date(
+																			v.target.value
+																		);
+																	}
+																}}
+															/>
+														}
+													</Typography>
+													<TextField
+														fullWidth
+														variant="outlined"
+														margin="dense"
+														label="Comment"
+														value={visit.comment}
+														multiline
+														onChange={e =>
+															(this.props.album.visits[
+																visitIndex
+															].comment =
+																e.target.value)
+														}
+													/>
+													<br />
+												</Paper>
+											</td>
+											{graphTypes.map(
+												(type, typeIndex) => (
+													<td
+														key={type}
+														style={{
+															display: viewControl
+																.showGraphs[
+																typeIndex
+															]
+																? undefined
+																: "none"
 														}}
 													>
-														<GraphViewer graph={visit.graphs[typeIndex]} width={'100%'} />
-													</div>
-												) : (
-													<AddImage
-														title={type}
-														onSelect={(src) => {
-															this.toCropSrc = src;
-															this.toCropVisitIndex = visitIndex;
-															this.toCropTypeIndex = typeIndex;
-														}}
-													/>
-												)}
-											</td>
-										))}
-									</tr>
-								);
-							})}
+														{visit.graphs[typeIndex]
+															.source ? (
+															<div
+																style={{
+																	width:
+																		viewControl.thumbnailSize,
+																	cursor:
+																		"pointer"
+																}}
+																onClick={() => {
+																	this.toShowVisitIndex = visitIndex;
+																	this.toShowTypeIndex = typeIndex;
+																}}
+															>
+																<GraphViewer
+																	graph={
+																		visit
+																			.graphs[
+																			typeIndex
+																		]
+																	}
+																	width={
+																		"100%"
+																	}
+																/>
+															</div>
+														) : (
+															<AddImage
+																title={type}
+																onSelect={src => {
+																	this.toCropSrc = src;
+																	this.toCropVisitIndex = visitIndex;
+																	this.toCropTypeIndex = typeIndex;
+																}}
+															/>
+														)}
+													</td>
+												)
+											)}
+										</tr>
+									);
+								}
+							)}
 						</tbody>
 					</table>
 					{this.toCropSrc ? (
 						<CropImageModal
 							src={this.toCropSrc}
 							onDismiss={() => {
-								this.toCropSrc = '';
+								this.toCropSrc = "";
 							}}
-							onSave={(croppedSrc) => {
-								this.props.album.visits[this.toCropVisitIndex].graphs[
+							onSave={croppedSrc => {
+								this.props.album.visits[
+									this.toCropVisitIndex
+								].graphs[
 									this.toCropTypeIndex
 								].source = croppedSrc;
 							}}
 						/>
 					) : (
-						''
+						""
 					)}
 					{this.toShowGraph ? (
-						<Dialog open={!!this.toShowGraph} onClose={() => {}} maxWidth="lg" fullWidth>
+						<Dialog
+							open={!!this.toShowGraph}
+							onClose={() => {}}
+							maxWidth="lg"
+							fullWidth
+						>
 							<DialogTitle>
 								<Typography variant="overline">
-									Record #{this.toShowVisitIndex + 1} - {this.toShowVisit.date.toDateString()}
+									Record #{this.toShowVisitIndex + 1} -{" "}
+									{this.toShowVisit.date.toDateString()}
 								</Typography>
-								<Typography variant="overline">{graphTypes[this.toShowTypeIndex]} View</Typography>
+								<Typography variant="overline">
+									{graphTypes[this.toShowTypeIndex]} View
+								</Typography>
 								<Button
 									color="primary"
 									className="dismiss-dialog"
@@ -219,27 +299,44 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 										this.toShowTypeIndex = -1;
 									}}
 								>
-									<Close fontSize="small" style={{ marginRight: 5 }} />
+									<Close
+										fontSize="small"
+										style={{ marginRight: 5 }}
+									/>
 									Dismiss
 								</Button>
 							</DialogTitle>
 							<DialogContent>
 								<Grid container>
-									<Grid item xs={8} style={{ position: 'relative' }}>
+									<Grid
+										item
+										xs={8}
+										style={{ position: "relative" }}
+									>
 										<div className="graph-buttons">
 											<IconButton
-												color={this.addingLine ? 'secondary' : 'default'}
+												color={
+													this.addingLine
+														? "secondary"
+														: "default"
+												}
 												onClick={() => {
-													this.addingLine = !this.addingLine;
+													this.addingLine = !this
+														.addingLine;
 													this.removingLine = false;
 												}}
 											>
 												<AddCircleOutline />
 											</IconButton>
 											<IconButton
-												color={this.removingLine ? 'secondary' : 'default'}
+												color={
+													this.removingLine
+														? "secondary"
+														: "default"
+												}
 												onClick={() => {
-													this.removingLine = !this.removingLine;
+													this.removingLine = !this
+														.removingLine;
 													this.addingLine = false;
 												}}
 											>
@@ -248,87 +345,138 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 										</div>
 										<GraphViewer
 											graph={this.toShowGraph}
-											width={'100%'}
+											width={"100%"}
 											onClick={(x, y) => {
 												if (this.addingLine) {
-													this.props.album.visits[this.toShowVisitIndex].graphs[
+													this.props.album.visits[
+														this.toShowVisitIndex
+													].graphs[
 														this.toShowTypeIndex
 													].addLine(x, y);
 												}
 											}}
-											onClickLine={(index) => {
+											onClickLine={index => {
 												if (!this.removingLine) {
 													return;
 												}
 
-												this.props.album.visits[this.toShowVisitIndex].graphs[
+												this.props.album.visits[
+													this.toShowVisitIndex
+												].graphs[
 													this.toShowTypeIndex
 												].lines.splice(index, 1);
 											}}
 										/>
 									</Grid>
-									<Grid item xs={4} style={{ padding: '0 10px 0 10px' }}>
+									<Grid
+										item
+										xs={4}
+										style={{ padding: "0 10px 0 10px" }}
+									>
 										{this.toShowGraph.lines.length ? (
-											<List className="lines-list" style={{ paddingTop: 0, paddingBottom: 0 }}>
-												{this.toShowGraph.lines.map((line, index) => {
-													if (!this.toShowGraph) {
-														return;
-													}
-													const relation = this.toShowGraph.relationsToReference[index];
-													return (
-														<ListItem key={index} dense style={{ background: line.color }}>
-															<ListItemText
-																primary={`${index === this.toShowGraph.refIndex
-																	? ''
-																	: relation}R`}
-															/>
-															<ListItemSecondaryAction>
-																{colors.map((color) => (
+											<List
+												className="lines-list"
+												style={{
+													paddingTop: 0,
+													paddingBottom: 0
+												}}
+											>
+												{this.toShowGraph.lines.map(
+													(line, index) => {
+														if (!this.toShowGraph) {
+															return;
+														}
+														const relation = this
+															.toShowGraph
+															.relationsToReference[
+															index
+														];
+														return (
+															<ListItem
+																key={index}
+																dense
+																style={{
+																	background:
+																		line.color
+																}}
+															>
+																<ListItemText
+																	primary={`${
+																		index ===
+																		this
+																			.toShowGraph
+																			.refIndex
+																			? ""
+																			: relation
+																	}R`}
+																/>
+																<ListItemSecondaryAction>
+																	{colors.map(
+																		color => (
+																			<IconButton
+																				style={{
+																					padding: 0
+																				}}
+																				onClick={() => {
+																					this.props.album.visits[
+																						this.toShowVisitIndex
+																					].graphs[
+																						this.toShowTypeIndex
+																					].lines[
+																						index
+																					].color = color;
+																				}}
+																			>
+																				<FiberManualRecordRounded
+																					style={{
+																						color,
+																						fontSize: 12
+																					}}
+																				/>
+																			</IconButton>
+																		)
+																	)}
 																	<IconButton
-																		style={{ padding: 0 }}
 																		onClick={() => {
 																			this.props.album.visits[
 																				this.toShowVisitIndex
-																			].graphs[this.toShowTypeIndex].lines[
-																				index
-																			].color = color;
+																			].graphs[
+																				this.toShowTypeIndex
+																			].refIndex = index;
+																		}}
+																		style={{
+																			padding: 0
 																		}}
 																	>
-																		<FiberManualRecordRounded
-																			style={{ color, fontSize: 12 }}
-																		/>
+																		<Flag />
 																	</IconButton>
-																))}
-																<IconButton
-																	onClick={() => {
-																		this.props.album.visits[
-																			this.toShowVisitIndex
-																		].graphs[this.toShowTypeIndex].refIndex = index;
-																	}}
-																	style={{ padding: 0 }}
-																>
-																	<Flag />
-																</IconButton>
-																<IconButton
-																	style={{ padding: 0 }}
-																	onClick={() => {
-																		this.props.album.visits[
-																			this.toShowVisitIndex
-																		].graphs[this.toShowTypeIndex].lines.splice(
-																			index,
-																			1
-																		);
-																	}}
-																>
-																	<DeleteForever />
-																</IconButton>
-															</ListItemSecondaryAction>
-														</ListItem>
-													);
-												})}
+																	<IconButton
+																		style={{
+																			padding: 0
+																		}}
+																		onClick={() => {
+																			this.props.album.visits[
+																				this
+																					.toShowVisitIndex
+																			].graphs[
+																				this
+																					.toShowTypeIndex
+																			].lines.splice(
+																				index,
+																				1
+																			);
+																		}}
+																	>
+																		<DeleteForever />
+																	</IconButton>
+																</ListItemSecondaryAction>
+															</ListItem>
+														);
+													}
+												)}
 											</List>
 										) : (
-											''
+											""
 										)}
 
 										<br />
@@ -339,11 +487,13 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 											label="Comment"
 											value={this.toShowGraph.comment}
 											multiline
-											onChange={(e) =>
-												(this.props.album.visits[this.toShowVisitIndex].graphs[
+											onChange={e =>
+												(this.props.album.visits[
+													this.toShowVisitIndex
+												].graphs[
 													this.toShowTypeIndex
-												].comment =
-													e.target.value)}
+												].comment = e.target.value)
+											}
 										/>
 									</Grid>
 								</Grid>
@@ -352,31 +502,38 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 								<Button
 									color="secondary"
 									onClick={() => {
-										this.props.album.visits[this.toShowVisitIndex].graphs[
-											this.toShowTypeIndex
-										].source =
-											'';
-										this.props.album.visits[this.toShowVisitIndex].graphs[
+										this.props.album.visits[
+											this.toShowVisitIndex
+										].graphs[this.toShowTypeIndex].source =
+											"";
+										this.props.album.visits[
+											this.toShowVisitIndex
+										].graphs[
 											this.toShowTypeIndex
 										].refIndex = 0;
-										this.props.album.visits[this.toShowVisitIndex].graphs[
+										this.props.album.visits[
+											this.toShowVisitIndex
+										].graphs[
 											this.toShowTypeIndex
 										].lines = [];
-										this.props.album.visits[this.toShowVisitIndex].graphs[
-											this.toShowTypeIndex
-										].comment =
-											'';
+										this.props.album.visits[
+											this.toShowVisitIndex
+										].graphs[this.toShowTypeIndex].comment =
+											"";
 										this.toShowVisitIndex = -1;
 										this.toShowTypeIndex = -1;
 									}}
 								>
-									<DeleteForever fontSize="small" style={{ marginRight: 5 }} />
+									<DeleteForever
+										fontSize="small"
+										style={{ marginRight: 5 }}
+									/>
 									Delete Graph
 								</Button>
 							</DialogActions>
 						</Dialog>
 					) : (
-						''
+						""
 					)}
 				</div>
 				<Fab
@@ -413,11 +570,17 @@ export class GraphViewer extends React.Component<{
 
 	@computed
 	get lines() {
-		const calcs: { c: { width: number; left: number; top: number; angle: number }; color: string }[] = [];
+		const calcs: {
+			c: { width: number; left: number; top: number; angle: number };
+			color: string;
+		}[] = [];
 
-		this.props.graph.lines.forEach((l) => {
+		this.props.graph.lines.forEach(l => {
 			if (l.x1 && l.x2 && l.y1 && l.y2) {
-				calcs.push({ c: this.calculateLine(l.x1, l.y1, l.x2, l.y2), color: l.color });
+				calcs.push({
+					c: this.calculateLine(l.x1, l.y1, l.x2, l.y2),
+					color: l.color
+				});
 			}
 		});
 
@@ -428,12 +591,14 @@ export class GraphViewer extends React.Component<{
 		if (!this.rect) {
 			return { width: 0, left: 0, top: 0, angle: 0 };
 		}
-		const x1P = x1 / 100 * this.rect.width + 2.5;
-		const x2P = x2 / 100 * this.rect.width + 2.5;
-		const y1P = y1 / 100 * this.rect.height + 2.5;
-		const y2P = y2 / 100 * this.rect.height + 2.5;
+		const x1P = (x1 / 100) * this.rect.width + 2.5;
+		const x2P = (x2 / 100) * this.rect.width + 2.5;
+		const y1P = (y1 / 100) * this.rect.height + 2.5;
+		const y2P = (y2 / 100) * this.rect.height + 2.5;
 
-		const width = Math.sqrt((x2P - x1P) * (x2P - x1P) + (y2P - y1P) * (y2P - y1P));
+		const width = Math.sqrt(
+			(x2P - x1P) * (x2P - x1P) + (y2P - y1P) * (y2P - y1P)
+		);
 		const left = (x1P + x2P) / 2 - width / 2;
 		const top = (y1P + y2P) / 2 - 1 / 2;
 		let angle = Math.atan2(y1P - y2P, x1P - x2P) * (180 / Math.PI);
@@ -454,7 +619,7 @@ export class GraphViewer extends React.Component<{
 				id={this.id}
 				className="graph-viewer"
 				style={{ width: this.props.width }}
-				onClick={(e) => {
+				onClick={e => {
 					if (!this.rect || !this.props.onClick) {
 						return;
 					}
@@ -462,22 +627,26 @@ export class GraphViewer extends React.Component<{
 					const floorY = this.rect.top;
 					const XPixels = e.clientX - floorX;
 					const YPixels = e.clientY - floorY;
-					const XPercent = XPixels / this.rect.width * 100;
-					const YPercent = YPixels / this.rect.height * 100;
+					const XPercent = (XPixels / this.rect.width) * 100;
+					const YPercent = (YPixels / this.rect.height) * 100;
 					this.props.onClick(XPercent, YPercent);
 				}}
 			>
-				<img src={this.props.graph.source} style={{ width: '100%' }} />
+				<img src={this.props.graph.source} style={{ width: "100%" }} />
 				<div className="points">
 					{this.props.graph.allPoints.map((point, index) => {
 						if (point.x === 0 && point.y === 0) {
-							return '';
+							return "";
 						}
 						return (
 							<div
 								key={index}
 								className="point"
-								style={{ background: point.color, top: `${point.y}%`, left: `${point.x}%` }}
+								style={{
+									background: point.color,
+									top: `${point.y}%`,
+									left: `${point.x}%`
+								}}
 							/>
 						);
 					})}
@@ -503,17 +672,18 @@ export class GraphViewer extends React.Component<{
 										}
 									}}
 								>
-									{this.props.graph.refIndex === index ? (
-										''
-									) : (
-										this.props.graph.relationsToReference[index]
-									)}R
+									{this.props.graph.refIndex === index
+										? ""
+										: this.props.graph.relationsToReference[
+												index
+										  ]}
+									R
 								</div>
 							);
 						})}
 					</div>
 				) : (
-					''
+					""
 				)}
 			</div>
 		);

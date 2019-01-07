@@ -18,7 +18,6 @@ import { Slider } from "@material-ui/lab";
 import { observable, computed } from "mobx";
 import { observer } from "mobx-react";
 import * as ImageEditor from "react-avatar-editor";
-import { ImageRotate90DegreesCcw } from "material-ui/svg-icons";
 const Editor = ImageEditor.default || ImageEditor;
 
 @observer
