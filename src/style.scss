@@ -3,16 +3,14 @@ body {
 	margin: 0;
 	padding: 0;
 	background: #eeeeee;
-	padding-bottom: 20px
+	padding-bottom: 20px;
 }
-
 
 .start {
 	padding-top: 10%;
 }
 
 .album {
-
 	margin-top: 64px;
 
 	.album-content-container {
@@ -33,13 +31,11 @@ body {
 		margin-bottom: 20px;
 		margin-top: 15px;
 
-
 		td {
 			vertical-align: super;
 			padding-left: 10px;
 		}
 	}
-
 
 	.album-content {
 		min-width: 100%;
@@ -61,24 +57,17 @@ body {
 			}
 		}
 
-
-
 		tr {
-
-
 			td {
-
 				min-width: 250px;
 				min-height: 150px;
 
 				.add-image {
-
 					text-align: center;
 					width: 80%;
 					margin: 0 auto;
 					height: 80%;
 					padding: 10px;
-
 				}
 
 				&:nth-child(1) {
@@ -86,10 +75,6 @@ body {
 					max-height: 100px;
 					min-width: 400px;
 				}
-
-
-
-
 			}
 		}
 	}
@@ -97,7 +82,7 @@ body {
 
 .cropping-dialog {
 	img {
-		width: 100%;
+		width: 350px;
 	}
 }
 
@@ -118,8 +103,6 @@ body {
 		height: 100%;
 		top: 0;
 		left: 0;
-
-
 
 		.point {
 			position: absolute;
@@ -154,12 +137,12 @@ body {
 	bottom: -15px;
 
 	button {
-		background: #EEE;
+		background: #eee;
 		margin-left: 5px;
 		box-shadow: -1px 0px 13px 4px rgba(0, 0, 0, 0.12);
 
 		&:hover {
-			background: #fff
+			background: #fff;
 		}
 	}
 }
@@ -174,4 +157,34 @@ body {
 	left: 20px;
 	position: absolute !important;
 	bottom: -20px;
+}
+
+.grid-el {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 9999;
+	pointer-events: none;
+	background-size: 30px 100%, 100% 30px;
+	background-image: linear-gradient(
+			to right,
+			#ffffff 0%,
+			transparent 2%,
+			transparent 100%
+		),
+		linear-gradient(to bottom, #fff 0%, transparent 2%, transparent 100%);
+}
+
+.crop-controls {
+	padding: 0px 25px;
+	text-align: center;
+	font-size: 5px;
+	&:nth-child(1) {
+		border-right: 1px dashed #757575;
+	}
+}
+
+.crop-bottom {
+	padding: 5px;
+	text-align: right;
 }

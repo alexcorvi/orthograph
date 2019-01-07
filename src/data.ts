@@ -1,25 +1,32 @@
-import { computed, observable } from 'mobx';
-import { saveAs } from 'file-saver';
+import { computed, observable } from "mobx";
+import { saveAs } from "file-saver";
 
-export const colors = [ '#FAFAFA', '#ffc107', '#90CAF9', '#cddc39', '#D1C4ED', '#FFAB91' ];
+export const colors = [
+	"#FAFAFA",
+	"#ffc107",
+	"#90CAF9",
+	"#cddc39",
+	"#D1C4ED",
+	"#FFAB91"
+];
 
 export const graphTypes = [
-	'anterior',
-	'right buccal',
-	'left buccal',
-	'occlusal upper',
-	'occlusal lower',
-	'facial',
-	'smiling',
-	'sideView',
-	'cephalometric'
+	"anterior",
+	"right buccal",
+	"left buccal",
+	"occlusal upper",
+	"occlusal lower",
+	"facial",
+	"smiling",
+	"sideView",
+	"cephalometric"
 ];
 
 class ViewControl {
 	@observable showGraphs: boolean[] = graphTypes.map(() => true);
 	@observable thumbnailSize: number = 300;
 	@observable showTopLists: boolean = true;
-
+	@observable asInternalApplication = false;
 	@observable mountPoints: boolean = true;
 
 	updateLines() {
@@ -30,7 +37,7 @@ class ViewControl {
 	}
 
 	constructor() {
-		window.addEventListener('resize', () => this.updateLines());
+		window.addEventListener("resize", () => this.updateLines());
 	}
 }
 
@@ -75,7 +82,8 @@ export class Line {
 	@observable x2: number = 0;
 	@observable y1: number = 0;
 	@observable y2: number = 0;
-	@observable color: string = colors[Math.floor(Math.random() * (5 - 0 + 1)) + 0];
+	@observable color: string =
+		colors[Math.floor(Math.random() * (5 - 0 + 1)) + 0];
 
 	constructor(json?: LineJSON) {
 		if (json) {
@@ -99,8 +107,8 @@ export class Line {
 }
 
 export class Graph {
-	@observable source: string = '';
-	@observable comment: string = '';
+	@observable source: string = "";
+	@observable comment: string = "";
 	@observable lines: Line[] = [];
 	@observable refIndex: number = 0;
 
@@ -108,7 +116,7 @@ export class Graph {
 		return {
 			source: this.source,
 			comment: this.comment,
-			lines: this.lines.map((line) => line.toJSON()),
+			lines: this.lines.map(line => line.toJSON()),
 			refIndex: this.refIndex
 		};
 	}
@@ -118,7 +126,7 @@ export class Graph {
 			this.source = json.source;
 			this.comment = json.comment;
 			this.refIndex = json.refIndex;
-			this.lines = json.lines.map((lineJSON) => new Line(lineJSON));
+			this.lines = json.lines.map(lineJSON => new Line(lineJSON));
 		}
 	}
 
@@ -128,17 +136,26 @@ export class Graph {
 		if (!r) {
 			return [];
 		}
-		const ref = Math.sqrt((r.x2 - r.x1) * (r.x2 - r.x1) + (r.y2 - r.y1) * (r.y2 - r.y1));
+		const ref = Math.sqrt(
+			(r.x2 - r.x1) * (r.x2 - r.x1) + (r.y2 - r.y1) * (r.y2 - r.y1)
+		);
 		return this.lines.map(
-			(l) =>
-				Math.round(Math.sqrt((l.x2 - l.x1) * (l.x2 - l.x1) + (l.y2 - l.y1) * (l.y2 - l.y1)) / ref * 100) / 100
+			l =>
+				Math.round(
+					(Math.sqrt(
+						(l.x2 - l.x1) * (l.x2 - l.x1) +
+							(l.y2 - l.y1) * (l.y2 - l.y1)
+					) /
+						ref) *
+						100
+				) / 100
 		);
 	}
 
 	@computed
 	get allPoints() {
 		const points: { x: number; y: number; color: string }[] = [];
-		this.lines.forEach((line) => {
+		this.lines.forEach(line => {
 			points.push({ x: line.x1, y: line.y1, color: line.color });
 			points.push({ x: line.x2, y: line.y2, color: line.color });
 		});
@@ -167,14 +184,14 @@ export class Graph {
 
 export class Visit {
 	@observable date: Date = new Date();
-	@observable comment: string = '';
+	@observable comment: string = "";
 	@observable graphs: Graph[] = graphTypes.map(() => new Graph());
 
 	toJSON(): VisitJSON {
 		return {
 			date: this.date.getTime(),
 			comment: this.comment,
-			graphs: this.graphs.map((graph) => graph.toJSON())
+			graphs: this.graphs.map(graph => graph.toJSON())
 		};
 	}
 
@@ -182,13 +199,13 @@ export class Visit {
 		if (json) {
 			this.date = new Date(json.date);
 			this.comment = json.comment;
-			this.graphs = json.graphs.map((graph) => new Graph(graph));
+			this.graphs = json.graphs.map(graph => new Graph(graph));
 		}
 	}
 }
 
 export class Step {
-	@observable title: string = '';
+	@observable title: string = "";
 	@observable done: boolean = false;
 
 	toJSON(): StepJSON {
@@ -205,36 +222,43 @@ export class Step {
 }
 
 export class Album {
-	@observable title: string = '';
+	@observable title: string = "";
 	@observable problemList: Step[] = [];
 	@observable patientComplaint: Step[] = [];
 	@observable treatmentPlan: Step[] = [];
 	@observable visits: Visit[] = [];
 
 	save() {
-		const data = 'orthograph:' + JSON.stringify(this.toJSON());
-		const fileName = prompt('File name to be saved');
-		const blob = new Blob([ data ], { type: 'text/plain;charset=utf-8' });
+		const data = "orthograph:" + JSON.stringify(this.toJSON());
+		const fileName = prompt("File name to be saved");
+		const blob = new Blob([data], { type: "text/plain;charset=utf-8" });
 		saveAs(blob, `${fileName || new Date().toLocaleDateString()}.ogp`);
+	}
+
+	saveToPatient() {
+		top.postMessage(
+			"orthograph-save:" + JSON.stringify(this.toJSON()),
+			"*"
+		);
 	}
 
 	toJSON(): AlbumJSON {
 		return {
 			title: this.title,
-			problemList: this.problemList.map((p) => p.toJSON()),
-			patientComplaint: this.patientComplaint.map((c) => c.toJSON()),
-			treatmentPlan: this.treatmentPlan.map((t) => t.toJSON()),
-			visits: this.visits.map((v) => v.toJSON())
+			problemList: this.problemList.map(p => p.toJSON()),
+			patientComplaint: this.patientComplaint.map(c => c.toJSON()),
+			treatmentPlan: this.treatmentPlan.map(t => t.toJSON()),
+			visits: this.visits.map(v => v.toJSON())
 		};
 	}
 
 	constructor(json?: AlbumJSON) {
 		if (json) {
 			this.title = json.title;
-			this.problemList = json.problemList.map((p) => new Step(p));
-			this.patientComplaint = json.patientComplaint.map((c) => new Step(c));
-			this.treatmentPlan = json.treatmentPlan.map((t) => new Step(t));
-			this.visits = json.visits.map((v) => new Visit(v));
+			this.problemList = json.problemList.map(p => new Step(p));
+			this.patientComplaint = json.patientComplaint.map(c => new Step(c));
+			this.treatmentPlan = json.treatmentPlan.map(t => new Step(t));
+			this.visits = json.visits.map(v => new Visit(v));
 		}
 	}
 }
