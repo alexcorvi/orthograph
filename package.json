@@ -40,6 +40,7 @@
 		"prod": "bash scripts/build-production.sh",
 		"lint": "bash scripts/lint.sh",
 		"serve": "bash scripts/serve.sh",
-		"dev": "bash scripts/build-development.sh"
+		"dev": "bash scripts/build-development.sh",
+		"deploy": "bash scripts/build-production.sh && cd dist && surge --domain orthograph.surge.sh ./"
 	}
 }
