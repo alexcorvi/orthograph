@@ -1,18 +1,25 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import ReactCrop from 'react-image-crop';
-import { Cancel, Check } from '@material-ui/icons';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Cancel, Check, RotateLeft, RotateRight } from "@material-ui/icons";
 import {
-    Dialog,
-    DialogTitle,
-    Grid,
-    IconButton,
-    Typography
-    } from '@material-ui/core';
-import { observable } from 'mobx';
-import { observer } from 'mobx-react';
-import 'react-image-crop/dist/ReactCrop.css';
-import 'react-image-crop/lib/ReactCrop.scss';
+	Dialog,
+	DialogTitle,
+	Grid,
+	IconButton,
+	Typography,
+	DialogActions,
+	DialogContent,
+	FormControlLabel,
+	Switch,
+	Divider,
+	Button
+} from "@material-ui/core";
+import { Slider } from "@material-ui/lab";
+import { observable, computed } from "mobx";
+import { observer } from "mobx-react";
+import * as ImageEditor from "react-avatar-editor";
+import { ImageRotate90DegreesCcw } from "material-ui/svg-icons";
+const Editor = ImageEditor.default || ImageEditor;
 
 @observer
 export class CropImageModal extends React.Component<{
@@ -20,11 +27,10 @@ export class CropImageModal extends React.Component<{
 	onDismiss: () => void;
 	onSave: (src: string) => void;
 }> {
-	@observable crop = { x: 0, y: 0, width: 0, aspect: 7 / 4 };
-
-	@observable pixelCrop: ReactCrop.PixelCrop = { x: 0, y: 0, width: 0, height: 0 };
-
-	@observable image: HTMLImageElement | undefined = undefined;
+	@observable zoom: number = 5;
+	@observable rotation: number = 1;
+	@observable showGrid: boolean = true;
+	@observable editorRef: ImageEditor.default | null = null;
 
 	render() {
 		return (
@@ -35,67 +41,128 @@ export class CropImageModal extends React.Component<{
 				}}
 				className="cropping-dialog"
 			>
-				<DialogTitle>
-					<Grid container>
-						<Grid item xs={6}>
-							<Typography style={{ lineHeight: '48px', color: '#424242' }} variant="h6">
-								Crop Image
-							</Typography>
+				<DialogContent style={{ padding: 0, position: "relative" }}>
+					<div className="grid-el" style={{ display: "block" }} />
+					<Editor
+						image={this.props.src}
+						width={300}
+						height={400}
+						color={[0, 0, 0, 0.6]}
+						scale={this.zoom}
+						rotate={this.rotation}
+						ref={ref => (this.editorRef = ref)}
+					/>
+				</DialogContent>
+				<DialogActions style={{ overflow: "hidden" }}>
+					<Grid container spacing={8}>
+						<Grid item xs={6} style={{ padding: 0 }}>
+							<div className="crop-controls">
+								<Typography
+									id="label"
+									style={{ textAlign: "center" }}
+								>
+									Zoom
+								</Typography>
+								<br />
+								<Slider
+									min={1}
+									max={30}
+									value={this.zoom}
+									onChange={(e, v) => {
+										this.zoom = v;
+									}}
+								/>
+								<br />
+								<FormControlLabel
+									control={
+										<Switch
+											value={this.showGrid}
+											onChange={(e, v) => {
+												this.showGrid = v;
+											}}
+										/>
+									}
+									label="Uncontrolled"
+								/>
+							</div>
 						</Grid>
-						<Grid item xs={6} style={{ textAlign: 'right' }}>
-							<IconButton
-								disabled={!this.crop.width}
-								color="primary"
-								onClick={() => {
-									this.props.onSave(this.getCroppedImg());
-									this.props.onDismiss();
-								}}
-							>
-								<Check />
-							</IconButton>
-							<IconButton color="secondary" onClick={() => this.props.onDismiss()}>
-								<Cancel />
-							</IconButton>
+						<Grid item xs={6} style={{ padding: 0 }}>
+							<div className="crop-controls">
+								<Typography
+									id="label"
+									style={{ textAlign: "center" }}
+								>
+									Rotation
+								</Typography>
+								<br />
+								<Slider
+									min={-359}
+									max={359}
+									value={this.rotation}
+									onChange={(e, v) => {
+										if (v) {
+											this.rotation = v;
+										}
+									}}
+								/>
+								<br />
+								<Grid container>
+									<Grid item xs={6}>
+										<IconButton
+											onClick={() => {
+												this.rotation =
+													this.rotation - 90;
+											}}
+										>
+											<RotateLeft />
+										</IconButton>
+									</Grid>
+									<Grid item xs={6}>
+										<IconButton
+											onClick={() => {
+												this.rotation =
+													this.rotation + 90;
+											}}
+										>
+											<RotateRight />
+										</IconButton>
+									</Grid>
+								</Grid>
+							</div>
 						</Grid>
 					</Grid>
-				</DialogTitle>
-				<ReactCrop
-					crop={this.crop}
-					src={this.props.src}
-					onChange={(crop, pixelCrop) => {
-						this.crop = crop as any;
-						this.pixelCrop = pixelCrop;
-					}}
-					onImageLoaded={(image) => {
-						this.image = image;
-					}}
-				/>
+				</DialogActions>
+				<Divider />
+				<div className="crop-bottom">
+					<Button
+						color="primary"
+						onClick={() => {
+							if (!this.editorRef) {
+								return;
+							}
+
+							this.props.onSave(
+								this.editorRef.getImage().toDataURL()
+							);
+							this.props.onDismiss();
+						}}
+					>
+						<Check fontSize="small" style={{ marginRight: 5 }} />
+						Add
+					</Button>
+					<Button
+						color="secondary"
+						onClick={() => this.props.onDismiss()}
+					>
+						<Cancel fontSize="small" style={{ marginRight: 5 }} />
+						Dismiss
+					</Button>
+				</div>
 			</Dialog>
 		);
 	}
-
-	getCroppedImg() {
-		const canvas = document.createElement('canvas');
-		canvas.width = this.pixelCrop.width;
-		canvas.height = this.pixelCrop.height;
-		const ctx = canvas.getContext('2d');
-
-		if (!ctx || !this.image) {
-			return '';
-		}
-
-		ctx.drawImage(
-			this.image,
-			this.pixelCrop.x,
-			this.pixelCrop.y,
-			this.pixelCrop.width,
-			this.pixelCrop.height,
-			0,
-			0,
-			this.pixelCrop.width,
-			this.pixelCrop.height
-		);
-
-		return canvas.toDataURL('image/jpeg');
-	}
 }
+
+// TODO: support touch event
+// TODO: add grid
+// TODO: add full rotation buttons (90deg incs)
