@@ -167,5 +167,3 @@ export class CropImageModal extends React.Component<{
 }
 
 // TODO: support touch event
-// TODO: add grid
-// TODO: add full rotation buttons (90deg incs)
