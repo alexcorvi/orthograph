@@ -6,7 +6,7 @@ A simple, minimal tool, for collection of orthodontic photographic records and c
 
 > Note: this is tool is included in a larger more elaborate dental practice management application called [Apexo](https://apexo.app)
 
-Demo: [http://orthograph.surge.sh/](http://orthograph.surge.sh/)
+Demo: [http://orthograph.apexo.app/](http://orthograph.apexo.app/)
 
 ## License
 
