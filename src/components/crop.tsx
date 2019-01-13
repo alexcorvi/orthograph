@@ -41,7 +41,7 @@ export class CropImageModal extends React.Component<{
 				className="cropping-dialog"
 			>
 				<DialogContent style={{ padding: 0, position: "relative" }}>
-					<div className="grid-el" style={{ display: "block" }} />
+					{this.showGrid ? <div className="grid-el" /> : ""}
 					<Editor
 						image={this.props.src}
 						width={300}
@@ -77,15 +77,15 @@ export class CropImageModal extends React.Component<{
 								<FormControlLabel
 									control={
 										<Switch
-											value={this.showGrid}
+											checked={this.showGrid}
 											onChange={(e, v) => {
-												if (e && v) {
+												if (e) {
 													this.showGrid = v;
 												}
 											}}
 										/>
 									}
-									label="Uncontrolled"
+									label="Show grid"
 								/>
 							</div>
 						</Grid>
