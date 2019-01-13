@@ -45,7 +45,7 @@ export class CropImageModal extends React.Component<{
 					<Editor
 						image={this.props.src}
 						width={300}
-						height={400}
+						height={530}
 						color={[0, 0, 0, 0.6]}
 						scale={this.zoom}
 						rotate={this.rotation}
