@@ -64,7 +64,7 @@ export class CropImageModal extends React.Component<{
 								</Typography>
 								<br />
 								<Slider
-									min={1}
+									min={0.3}
 									max={30}
 									value={this.zoom}
 									onChange={(e, v) => {
