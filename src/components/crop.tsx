@@ -23,9 +23,11 @@ const Editor = ImageEditor.default || ImageEditor;
 @observer
 export class CropImageModal extends React.Component<{
 	src: string;
+	prevSrc: string;
 	onDismiss: () => void;
 	onSave: (src: string) => void;
 }> {
+	@observable overlay: boolean = false;
 	@observable zoom: number = 1;
 	@observable rotation: number = 1;
 	@observable showGrid: boolean = true;
@@ -42,6 +44,14 @@ export class CropImageModal extends React.Component<{
 			>
 				<DialogContent style={{ padding: 0, position: "relative" }}>
 					{this.showGrid ? <div className="grid-el" /> : ""}
+					{this.overlay ? (
+						<img
+							src={this.props.prevSrc}
+							style={{ position: "absolute", width: "100%" }}
+						/>
+					) : (
+						""
+					)}
 					<Editor
 						image={this.props.src}
 						width={300}
@@ -50,6 +60,7 @@ export class CropImageModal extends React.Component<{
 						scale={this.zoom}
 						rotate={this.rotation}
 						ref={ref => (this.editorRef = ref)}
+						style={{ opacity: this.overlay ? 0.5 : 1 }}
 					/>
 				</DialogContent>
 				<DialogActions style={{ overflow: "hidden" }}>
@@ -85,7 +96,20 @@ export class CropImageModal extends React.Component<{
 											}}
 										/>
 									}
-									label="Show grid"
+									label="Grid"
+								/>
+								<FormControlLabel
+									control={
+										<Switch
+											checked={this.overlay}
+											onChange={(e, v) => {
+												if (e) {
+													this.overlay = v;
+												}
+											}}
+										/>
+									}
+									label="Overlay"
 								/>
 							</div>
 						</Grid>

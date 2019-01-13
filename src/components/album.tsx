@@ -62,6 +62,18 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 		}
 	}
 
+	@computed get toCropPreviousSource() {
+		const prevVisit = this.props.album.visits[this.toCropVisitIndex - 1];
+		if (!prevVisit) {
+			return undefined;
+		}
+		const graph = prevVisit.graphs[this.toCropTypeIndex];
+		if (!graph) {
+			return undefined;
+		}
+		return graph.source;
+	}
+
 	render() {
 		return (
 			<div
@@ -262,6 +274,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 					{this.toCropSrc ? (
 						<CropImageModal
 							src={this.toCropSrc}
+							prevSrc={this.toCropPreviousSource}
 							onDismiss={() => {
 								this.toCropSrc = "";
 							}}
