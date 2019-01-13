@@ -26,7 +26,7 @@ export class CropImageModal extends React.Component<{
 	onDismiss: () => void;
 	onSave: (src: string) => void;
 }> {
-	@observable zoom: number = 5;
+	@observable zoom: number = 1;
 	@observable rotation: number = 1;
 	@observable showGrid: boolean = true;
 	@observable editorRef: ImageEditor.default | null = null;
