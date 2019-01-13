@@ -29,7 +29,8 @@ export class CropImageModal extends React.Component<{
 }> {
 	@observable overlay: boolean = false;
 	@observable zoom: number = 1;
-	@observable rotation: number = 1;
+	@observable baseRotation: number = 1;
+	@observable addedRotation: number = 0;
 	@observable showGrid: boolean = true;
 	@observable editorRef: ImageEditor.default | null = null;
 
@@ -58,7 +59,7 @@ export class CropImageModal extends React.Component<{
 						height={530}
 						color={[0, 0, 0, 0.6]}
 						scale={this.zoom}
-						rotate={this.rotation}
+						rotate={this.baseRotation + this.addedRotation}
 						ref={ref => (this.editorRef = ref)}
 						style={{ opacity: this.overlay ? 0.5 : 1 }}
 					/>
@@ -76,7 +77,7 @@ export class CropImageModal extends React.Component<{
 								<br />
 								<Slider
 									min={0.3}
-									max={30}
+									max={5}
 									value={this.zoom}
 									onChange={(e, v) => {
 										if (e && v) {
@@ -123,12 +124,12 @@ export class CropImageModal extends React.Component<{
 								</Typography>
 								<br />
 								<Slider
-									min={-179}
-									max={179}
-									value={this.rotation}
+									min={-45}
+									max={45}
+									value={this.addedRotation}
 									onChange={(e, v) => {
 										if (e && v) {
-											this.rotation = v;
+											this.addedRotation = v;
 										}
 									}}
 								/>
@@ -137,8 +138,8 @@ export class CropImageModal extends React.Component<{
 									<Grid item xs={6}>
 										<IconButton
 											onClick={() => {
-												this.rotation =
-													this.rotation - 90;
+												this.baseRotation =
+													this.baseRotation - 90;
 											}}
 										>
 											<RotateLeft />
@@ -147,8 +148,8 @@ export class CropImageModal extends React.Component<{
 									<Grid item xs={6}>
 										<IconButton
 											onClick={() => {
-												this.rotation =
-													this.rotation + 90;
+												this.baseRotation =
+													this.baseRotation + 90;
 											}}
 										>
 											<RotateRight />
