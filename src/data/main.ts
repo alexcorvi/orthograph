@@ -11,6 +11,10 @@ export interface DropboxFile {
 
 class MainData {
 	@observable loading: boolean = false;
+
+	@observable loaded: number = 0;
+	@observable total: number = 0;
+
 	@observable validToken: boolean = false;
 	@observable validFile: boolean = false;
 	@observable path: string[] = ["", ""];
@@ -22,6 +26,14 @@ class MainData {
 	@observable availableAlbums: DropboxFile[] = [];
 
 	@observable openedAlbum: boolean = false;
+
+	@computed get totalMBytes() {
+		return this.bytesToMB(this.total);
+	}
+
+	@computed get loadedMBytes() {
+		return this.bytesToMB(this.loaded);
+	}
 
 	@computed get accessToken() {
 		return this.path[0];
@@ -103,6 +115,15 @@ class MainData {
 				}
 			};
 
+			xhr.onprogress = ev => {
+				this.total = ev.total;
+				this.loaded = ev.loaded > this.loaded ? ev.loaded : this.loaded;
+				if (this.total === this.loaded) {
+					this.total = 0;
+					this.loaded = 0;
+				}
+			};
+
 			xhr.onerror = () => (this.loading = false);
 
 			xhr.open("POST", "https://api.dropboxapi.com/2/files/list_folder");
@@ -125,6 +146,14 @@ class MainData {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.responseType = "arraybuffer";
+			xhr.onprogress = ev => {
+				this.total = ev.total;
+				this.loaded = ev.loaded > this.loaded ? ev.loaded : this.loaded;
+				if (this.total === this.loaded) {
+					this.total = 0;
+					this.loaded = 0;
+				}
+			};
 			xhr.onload = () => {
 				this.loading = false;
 				if (xhr.status === 200) {
@@ -179,6 +208,16 @@ class MainData {
 					return reject(xhr.response || "Unable to upload file");
 				}
 			};
+
+			xhr.onprogress = ev => {
+				this.total = ev.total;
+				this.loaded = ev.loaded > this.loaded ? ev.loaded : this.loaded;
+				if (this.total === this.loaded) {
+					this.total = 0;
+					this.loaded = 0;
+				}
+			};
+
 			xhr.onerror = () => (this.loading = false);
 
 			xhr.open("POST", "https://content.dropboxapi.com/2/files/upload");
@@ -213,6 +252,14 @@ class MainData {
 					return reject(xhr.response || "Unable to rename file");
 				}
 			};
+			xhr.onprogress = ev => {
+				this.total = ev.total;
+				this.loaded = ev.loaded > this.loaded ? ev.loaded : this.loaded;
+				if (this.total === this.loaded) {
+					this.total = 0;
+					this.loaded = 0;
+				}
+			};
 			xhr.onerror = () => (this.loading = false);
 
 			xhr.open("POST", "https://api.dropboxapi.com/2/files/move_v2");
@@ -244,6 +291,14 @@ class MainData {
 					return reject(xhr.response || "Unable to delete file");
 				}
 			};
+			xhr.onprogress = ev => {
+				this.total = ev.total;
+				this.loaded = ev.loaded > this.loaded ? ev.loaded : this.loaded;
+				if (this.total === this.loaded) {
+					this.total = 0;
+					this.loaded = 0;
+				}
+			};
 			xhr.onerror = () => (this.loading = false);
 
 			xhr.open("POST", "https://api.dropboxapi.com/2/files/delete_v2");
@@ -273,6 +328,14 @@ class MainData {
 
 	setHash(accessToken: string, fileName: string) {
 		location.href = `#!/${accessToken}${fileName ? `/${fileName}` : ""}`;
+	}
+
+	bytesToMB(input: number) {
+		return Math.round((input / 1000 / 1000) * 100) / 100;
+	}
+
+	bytesToKB(input: number) {
+		return Math.round((input / 1000 / 1000) * 100) / 100;
 	}
 }
 

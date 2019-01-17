@@ -203,7 +203,7 @@ h2 {
 		height: 10em;
 	}
 	.loader {
-		margin: 150px auto;
+		margin: 100px auto 20px;
 		font-size: 10px;
 		position: relative;
 		text-indent: -9999em;
@@ -235,6 +235,25 @@ h2 {
 		100% {
 			-webkit-transform: rotate(360deg);
 			transform: rotate(360deg);
+		}
+	}
+
+	.bar-loader {
+		width: 200px;
+		margin: 20px auto;
+		height: 10px;
+		position: relative;
+
+		.back {
+			height: 100%;
+			background: #e3e3e3;
+			position: absolute;
+		}
+
+		.top {
+			height: 100%;
+			background: #ff5722;
+			position: relative;
 		}
 	}
 }
