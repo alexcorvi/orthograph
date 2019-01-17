@@ -5,9 +5,10 @@ import {
 	Delete,
 	RemoveRedEye,
 	SaveAlt,
-	Save
+	Save,
+	Close
 } from "@material-ui/icons";
-import { Album, graphTypes, Step, viewControl } from "../data";
+import { Album, graphTypes, Step } from "../data/album-data";
 import {
 	AppBar,
 	Button,
@@ -27,9 +28,11 @@ import {
 } from "@material-ui/core";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
+import { albumView } from "../data/album-view-data";
+import { main } from "../data/main";
 
 @observer
-export class AlbumHeader extends React.Component<{ album: Album }> {
+export class AlbumHeader extends React.Component {
 	@observable problemToAdd: string = "";
 	@observable planToAdd: string = "";
 
@@ -41,7 +44,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 		if (!this.problemToAdd) {
 			return;
 		}
-		this.props.album.problemList.push(
+		main.currentlyOpenAlbum.problemList.push(
 			new Step({ title: this.problemToAdd, done: false })
 		);
 		this.problemToAdd = "";
@@ -51,7 +54,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 		if (!this.planToAdd) {
 			return;
 		}
-		this.props.album.treatmentPlan.push(
+		main.currentlyOpenAlbum.treatmentPlan.push(
 			new Step({ title: this.planToAdd, done: false })
 		);
 		this.planToAdd = "";
@@ -61,7 +64,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 		if (!this.compliantToAdd) {
 			return;
 		}
-		this.props.album.patientComplaint.push(
+		main.currentlyOpenAlbum.patientComplaint.push(
 			new Step({ title: this.compliantToAdd, done: false })
 		);
 		this.compliantToAdd = "";
@@ -87,36 +90,37 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 						>
 							<InputBase
 								className="album-title"
-								value={this.props.album.title}
+								value={main.currentlyOpenAlbum.title}
 								onChange={e => {
-									this.props.album.title = e.target.value;
+									main.currentlyOpenAlbum.title =
+										e.target.value;
 								}}
 							/>
 						</Typography>
-						{viewControl.asInternalApplication ? (
-							<IconButton
-								color="inherit"
-								onClick={() => {
-									this.props.album.saveToPatient();
-								}}
-							>
-								<Save />
-							</IconButton>
-						) : (
-							<IconButton
-								color="inherit"
-								onClick={() => {
-									this.props.album.save();
-								}}
-							>
-								<SaveAlt />
-							</IconButton>
-						)}
+						<IconButton
+							color="inherit"
+							onClick={async () => {
+								await main.svAlbum(main.currentlyOpenAlbum);
+								await main.listAlbums();
+							}}
+						>
+							<Save />
+						</IconButton>
+						<IconButton
+							color="inherit"
+							onClick={() => {
+								main.openedAlbum = false;
+								main.setHash(main.accessToken, "");
+								main.listAlbums();
+							}}
+						>
+							<Close />
+						</IconButton>
 					</Toolbar>
 				</AppBar>
 				<table
 					style={{
-						display: viewControl.showTopLists ? undefined : "none"
+						display: albumView.showTopLists ? undefined : "none"
 					}}
 					className="top-lists"
 				>
@@ -156,7 +160,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 
 									<Divider />
 									<List>
-										{this.props.album.patientComplaint.map(
+										{main.currentlyOpenAlbum.patientComplaint.map(
 											(compliant, index) => {
 												return (
 													<ListItem
@@ -173,7 +177,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																padding: 0
 															}}
 															onChange={e =>
-																(this.props.album.patientComplaint[
+																(main.currentlyOpenAlbum.patientComplaint[
 																	index
 																].done = e
 																	.target
@@ -190,7 +194,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																compliant.title
 															}
 															onChange={e =>
-																(this.props.album.patientComplaint[
+																(main.currentlyOpenAlbum.patientComplaint[
 																	index
 																].title =
 																	e.target.value)
@@ -202,7 +206,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																	padding: 0
 																}}
 																onClick={() =>
-																	this.props.album.patientComplaint.splice(
+																	main.currentlyOpenAlbum.patientComplaint.splice(
 																		index,
 																		1
 																	)
@@ -251,7 +255,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 
 									<Divider />
 									<List>
-										{this.props.album.problemList.map(
+										{main.currentlyOpenAlbum.problemList.map(
 											(problem, index) => {
 												return (
 													<ListItem
@@ -268,7 +272,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																padding: 0
 															}}
 															onChange={e =>
-																(this.props.album.problemList[
+																(main.currentlyOpenAlbum.problemList[
 																	index
 																].done = e
 																	.target
@@ -285,7 +289,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																problem.title
 															}
 															onChange={e =>
-																(this.props.album.problemList[
+																(main.currentlyOpenAlbum.problemList[
 																	index
 																].title =
 																	e.target.value)
@@ -297,7 +301,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																	padding: 0
 																}}
 																onClick={() =>
-																	this.props.album.problemList.splice(
+																	main.currentlyOpenAlbum.problemList.splice(
 																		index,
 																		1
 																	)
@@ -346,7 +350,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 
 									<Divider />
 									<List>
-										{this.props.album.treatmentPlan.map(
+										{main.currentlyOpenAlbum.treatmentPlan.map(
 											(plan, index) => {
 												return (
 													<ListItem
@@ -363,7 +367,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																padding: 0
 															}}
 															onChange={e =>
-																(this.props.album.treatmentPlan[
+																(main.currentlyOpenAlbum.treatmentPlan[
 																	index
 																].done = e
 																	.target
@@ -376,7 +380,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 														<InputBase
 															value={plan.title}
 															onChange={e =>
-																(this.props.album.treatmentPlan[
+																(main.currentlyOpenAlbum.treatmentPlan[
 																	index
 																].title =
 																	e.target.value)
@@ -388,7 +392,7 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 																	padding: 0
 																}}
 																onClick={() =>
-																	this.props.album.treatmentPlan.splice(
+																	main.currentlyOpenAlbum.treatmentPlan.splice(
 																		index,
 																		1
 																	)
@@ -416,13 +420,13 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 							dense
 							button
 							onClick={() => {
-								viewControl.showTopLists = !viewControl.showTopLists;
+								albumView.showTopLists = !albumView.showTopLists;
 							}}
 						>
 							<Checkbox
-								checked={viewControl.showTopLists}
+								checked={albumView.showTopLists}
 								onChange={e => {
-									viewControl.showTopLists = e.target.checked;
+									albumView.showTopLists = e.target.checked;
 								}}
 								tabIndex={-1}
 								disableRipple
@@ -437,14 +441,14 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 								dense
 								button
 								onClick={() => {
-									viewControl.showGraphs[index] = !viewControl
+									albumView.showGraphs[index] = !albumView
 										.showGraphs[index];
 								}}
 							>
 								<Checkbox
-									checked={viewControl.showGraphs[index]}
+									checked={albumView.showGraphs[index]}
 									onChange={e => {
-										viewControl.showGraphs[index] =
+										albumView.showGraphs[index] =
 											e.target.checked;
 									}}
 									tabIndex={-1}
@@ -463,15 +467,15 @@ export class AlbumHeader extends React.Component<{ album: Album }> {
 								label="thumbnail size"
 								variant="outlined"
 								type="number"
-								value={viewControl.thumbnailSize}
+								value={albumView.thumbnailSize}
 								fullWidth
 								onChange={e => {
 									const val = Number(e.target.value);
 									if (isNaN(val)) {
 										return;
 									}
-									viewControl.thumbnailSize = val;
-									viewControl.updateLines();
+									albumView.thumbnailSize = val;
+									albumView.updateLines();
 								}}
 							/>
 						</ListItem>

@@ -8,12 +8,14 @@
 		"@types/file-saver": "^2.0.0",
 		"@types/material-ui": "^0.21.5",
 		"@types/react-avatar-editor": "^10.3.2",
+		"@types/react-hammerjs": "^1.0.0",
 		"file-saver": "^2.0.0",
 		"mobx": "^5.8.0",
 		"mobx-react": "^5.4.3",
 		"react": "^16.7.0",
 		"react-avatar-editor": "^11.0.4",
-		"react-dom": "^16.7.0"
+		"react-dom": "^16.7.0",
+		"react-hammerjs": "^1.0.1"
 	},
 	"devDependencies": {
 		"@types/react": "^16.7.18",

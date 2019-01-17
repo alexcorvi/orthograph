@@ -84,6 +84,11 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-2.0.0.tgz#cbb49815a5e1129d5f23836a98d65d93822409af"
 
+"@types/hammerjs@*":
+  version "2.0.36"
+  resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.36.tgz#17ce0a235e9ffbcdcdf5095646b374c2bf615a4c"
+  integrity sha512-7TUK/k2/QGpEAv/BCwSHlYu3NXZhQ9ZwBYpzr9tjlPIL2C5BeGhH3DmVavRx3ZNyELX5TLC91JTz/cen6AAtIQ==
+
 "@types/jss@^9.5.6":
   version "9.5.7"
   resolved "https://registry.yarnpkg.com/@types/jss/-/jss-9.5.7.tgz#fa57a6d0b38a3abef8a425e3eb6a53495cb9d5a0"
@@ -119,6 +124,14 @@
   version "16.0.11"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.0.11.tgz#bd10ccb0d9260343f4b9a49d4f7a8330a5c1f081"
   dependencies:
+    "@types/react" "*"
+
+"@types/react-hammerjs@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-hammerjs/-/react-hammerjs-1.0.0.tgz#55d7fef473275b77ca880a543e9a42e6eaac85a4"
+  integrity sha512-unif/US+pqqWTFuwZtIhgA1+MnfmyuEGhd69FzyWRr5vum8n4rd5Yq7vo7hylNn3afWfi1Pq+gCJJGLMVvtdeA==
+  dependencies:
+    "@types/hammerjs" "*"
     "@types/react" "*"
 
 "@types/react-transition-group@^2.0.8":
@@ -1807,6 +1820,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   version "4.1.15"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
 
+hammerjs@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/hammerjs/-/hammerjs-2.0.8.tgz#04ef77862cff2bb79d30f7692095930222bf60f1"
+  integrity sha1-BO93hiz/K7edMPdpIJWTAiK/YPE=
+
 har-schema@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/har-schema/-/har-schema-2.0.0.tgz#a94c2224ebcac04782a0d9035521f24735b7ec92"
@@ -3421,6 +3439,13 @@ react-event-listener@^0.6.2:
     "@babel/runtime" "7.2.0"
     prop-types "^15.6.0"
     warning "^4.0.1"
+
+react-hammerjs@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-hammerjs/-/react-hammerjs-1.0.1.tgz#bc1ed9e9ef7da057163fb169ce12917b6d6ca7d8"
+  integrity sha1-vB7Z6e99oFcWP7FpzhKRe21sp9g=
+  dependencies:
+    hammerjs "^2.0.8"
 
 react-is@^16.3.2, react-is@^16.6.3:
   version "16.7.0"

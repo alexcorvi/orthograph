@@ -22,27 +22,6 @@ export const graphTypes = [
 	"cephalometric"
 ];
 
-class ViewControl {
-	@observable showGraphs: boolean[] = graphTypes.map(() => true);
-	@observable thumbnailSize: number = 300;
-	@observable showTopLists: boolean = true;
-	@observable asInternalApplication = false;
-	@observable mountPoints: boolean = true;
-
-	updateLines() {
-		this.mountPoints = false;
-		setTimeout(() => {
-			this.mountPoints = true;
-		}, 500);
-	}
-
-	constructor() {
-		window.addEventListener("resize", () => this.updateLines());
-	}
-}
-
-export const viewControl = new ViewControl();
-
 interface LineJSON {
 	x1: number;
 	x2: number;
@@ -70,6 +49,7 @@ interface StepJSON {
 }
 
 interface AlbumJSON {
+	_id: string;
 	title: string;
 	problemList: StepJSON[];
 	patientComplaint: StepJSON[];
@@ -222,24 +202,23 @@ export class Step {
 }
 
 export class Album {
+	@observable _id: string =
+		Math.random()
+			.toString(36)
+			.replace(/[^a-z]/gi, "") +
+		new Date()
+			.getTime()
+			.toString(36)
+			.replace(/[^a-z]/gi, "");
+
 	@observable title: string = "";
 	@observable problemList: Step[] = [];
 	@observable patientComplaint: Step[] = [];
 	@observable treatmentPlan: Step[] = [];
 	@observable visits: Visit[] = [];
 
-	save() {
-		const data = "orthograph:" + JSON.stringify(this.toJSON());
-		const fileName = prompt("File name to be saved");
-		const blob = new Blob([data], { type: "text/plain;charset=utf-8" });
-		saveAs(blob, `${fileName || new Date().toLocaleDateString()}.ogp`);
-	}
-
-	saveToPatient() {
-		top.postMessage(
-			"orthograph-save:" + JSON.stringify(this.toJSON()),
-			"*"
-		);
+	@computed get fileName() {
+		return this._id + "__" + this.title;
 	}
 
 	toJSON(): AlbumJSON {
@@ -248,8 +227,15 @@ export class Album {
 			problemList: this.problemList.map(p => p.toJSON()),
 			patientComplaint: this.patientComplaint.map(c => c.toJSON()),
 			treatmentPlan: this.treatmentPlan.map(t => t.toJSON()),
-			visits: this.visits.map(v => v.toJSON())
+			visits: this.visits.map(v => v.toJSON()),
+			_id: this._id
 		};
+	}
+
+	toBlob(): Blob {
+		const data = "orthograph:" + JSON.stringify(this.toJSON());
+		const blob = new Blob([data], { type: "text/plain;charset=utf-8" });
+		return blob;
 	}
 
 	constructor(json?: AlbumJSON) {
@@ -259,6 +245,7 @@ export class Album {
 			this.patientComplaint = json.patientComplaint.map(c => new Step(c));
 			this.treatmentPlan = json.treatmentPlan.map(t => new Step(t));
 			this.visits = json.visits.map(v => new Visit(v));
+			this._id = json._id;
 		}
 	}
 }

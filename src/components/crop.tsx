@@ -18,7 +18,12 @@ import { Slider } from "@material-ui/lab";
 import { observable, computed } from "mobx";
 import { observer } from "mobx-react";
 import * as ImageEditor from "react-avatar-editor";
+import * as Hammer from "react-hammerjs";
 const Editor = ImageEditor.default || ImageEditor;
+const ReactHammer: typeof Hammer = (Hammer as any).default || Hammer;
+
+const MAX_ZOOM = 5;
+const MIN_ZOOM = 0.3;
 
 @observer
 export class CropImageModal extends React.Component<{
@@ -34,6 +39,9 @@ export class CropImageModal extends React.Component<{
 	@observable showGrid: boolean = true;
 	@observable editorRef: ImageEditor.default | null = null;
 
+	@observable x: number = 0.5;
+	@observable y: number = 0.5;
+
 	render() {
 		return (
 			<Dialog
@@ -48,21 +56,72 @@ export class CropImageModal extends React.Component<{
 					{this.overlay ? (
 						<img
 							src={this.props.prevSrc}
-							style={{ position: "absolute", width: "100%" }}
+							className="crop-overlay"
 						/>
 					) : (
 						""
 					)}
-					<Editor
-						image={this.props.src}
-						width={280}
-						height={530}
-						color={[0, 0, 0, 0.6]}
-						scale={this.zoom}
-						rotate={this.baseRotation + this.addedRotation}
-						ref={ref => (this.editorRef = ref)}
-						style={{ opacity: this.overlay ? 0.5 : 1 }}
-					/>
+
+					<ReactHammer
+						options={{
+							recognizers: {
+								pinch: { enable: true },
+								pan: { enable: true }
+							}
+						}}
+						onPinch={a => {
+							if ((a as any).additionalEvent === "pinchin") {
+								if (this.zoom >= MIN_ZOOM) {
+									this.zoom = this.zoom - 0.05;
+								}
+							} else {
+								if (this.zoom < MAX_ZOOM) {
+									this.zoom = this.zoom + 0.05;
+								}
+							}
+						}}
+						onPan={a => {
+							const type:
+								| undefined
+								| "panleft"
+								| "panup"
+								| "pandown"
+								| "panright" = (a as any).additionalEvent;
+							if (type === "panleft") {
+								this.x = this.x + 0.01 / this.zoom;
+							}
+							if (type === "panright") {
+								this.x = this.x - 0.01 / this.zoom;
+							}
+							if (type === "panup") {
+								this.y = this.y + 0.01 / this.zoom;
+							}
+							if (type === "pandown") {
+								this.y = this.y - 0.01 / this.zoom;
+							}
+						}}
+					>
+						<div>
+							<Editor
+								image={this.props.src}
+								width={280}
+								height={530}
+								color={[0, 0, 0, 0.6]}
+								scale={this.zoom}
+								rotate={this.baseRotation + this.addedRotation}
+								ref={ref => (this.editorRef = ref)}
+								style={{ opacity: this.overlay ? 0.5 : 1 }}
+								position={{ x: this.x, y: this.y }}
+								onPositionChange={
+									((p: { x: number; y: number }) => {
+										console.log(p);
+										this.x = p.x;
+										this.y = p.y;
+									}) as any
+								}
+							/>
+						</div>
+					</ReactHammer>
 				</DialogContent>
 				<DialogActions style={{ overflow: "hidden" }}>
 					<Grid container spacing={8}>
@@ -76,8 +135,8 @@ export class CropImageModal extends React.Component<{
 								</Typography>
 								<br />
 								<Slider
-									min={0.3}
-									max={5}
+									min={MIN_ZOOM}
+									max={MAX_ZOOM}
 									value={this.zoom}
 									onChange={(e, v) => {
 										if (e && v) {
@@ -108,6 +167,7 @@ export class CropImageModal extends React.Component<{
 													this.overlay = v;
 												}
 											}}
+											disabled={!this.props.prevSrc}
 										/>
 									}
 									label="Overlay"
@@ -192,3 +252,4 @@ export class CropImageModal extends React.Component<{
 }
 
 // TODO: support touch event
+// readme instructions

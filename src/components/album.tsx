@@ -1,26 +1,24 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {
-	AddCircle,
 	AddCircleOutline,
 	Close,
 	DeleteForever,
 	FiberManualRecordRounded,
 	Flag,
-	LineStyle,
 	PlaylistAdd,
-	RemoveCircle
+	RemoveCircle,
+	Layers
 } from "@material-ui/icons";
 import { AddImage } from "./add-image";
-import { Album, colors, Graph, graphTypes, viewControl, Visit } from "../data";
-import { AlbumHeader } from "./header";
+import { Album, colors, Graph, graphTypes, Visit } from "../data/album-data";
+import { AlbumHeader } from "./album-header";
 import {
 	Button,
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	Divider,
 	Fab,
 	Grid,
 	IconButton,
@@ -35,9 +33,11 @@ import {
 import { computed, observable } from "mobx";
 import { CropImageModal } from "./crop";
 import { observer } from "mobx-react";
+import { albumView } from "../data/album-view-data";
+import { main } from "../data/main";
 
 @observer
-export class AlbumContents extends React.Component<{ album: Album }> {
+export class AlbumContents extends React.Component {
 	@observable toCropSrc: string = "";
 	@observable toCropVisitIndex: number = 0;
 	@observable toCropTypeIndex: number = 0;
@@ -47,10 +47,11 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 
 	@observable addingLine: boolean = false;
 	@observable removingLine: boolean = false;
+	@observable overlay: boolean = false;
 
 	@computed
 	get toShowVisit() {
-		return this.props.album.visits[this.toShowVisitIndex];
+		return main.currentlyOpenAlbum.visits[this.toShowVisitIndex];
 	}
 
 	@computed
@@ -62,8 +63,23 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 		}
 	}
 
+	@computed
+	get toShowPrevGraph() {
+		if (!this.toShowVisit) {
+			return undefined;
+		}
+		const prevVisit =
+			main.currentlyOpenAlbum.visits[this.toShowVisitIndex - 1];
+		if (!prevVisit) {
+			return undefined;
+		} else {
+			return prevVisit.graphs[this.toShowTypeIndex];
+		}
+	}
+
 	@computed get toCropPreviousSource() {
-		const prevVisit = this.props.album.visits[this.toCropVisitIndex - 1];
+		const prevVisit =
+			main.currentlyOpenAlbum.visits[this.toCropVisitIndex - 1];
 		if (!prevVisit) {
 			return undefined;
 		}
@@ -89,7 +105,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 									<th
 										key={type}
 										style={{
-											display: viewControl.showGraphs[i]
+											display: albumView.showGraphs[i]
 												? undefined
 												: "none"
 										}}
@@ -105,7 +121,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 							</tr>
 						</thead>
 						<tbody>
-							{this.props.album.visits.map(
+							{main.currentlyOpenAlbum.visits.map(
 								(visit, visitIndex) => {
 									return (
 										<tr key={visitIndex}>
@@ -137,10 +153,10 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 																) {
 																	return;
 																}
-																this.props.album.visits.splice(
+																main.currentlyOpenAlbum.visits.splice(
 																	val,
 																	0,
-																	this.props.album.visits.splice(
+																	main.currentlyOpenAlbum.visits.splice(
 																		visitIndex,
 																		1
 																	)[0]
@@ -150,7 +166,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 														<Button
 															color="secondary"
 															onClick={() => {
-																this.props.album.visits.splice(
+																main.currentlyOpenAlbum.visits.splice(
 																	visitIndex,
 																	1
 																);
@@ -186,7 +202,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 																		v.target
 																			.value
 																	) {
-																		this.props.album.visits[
+																		main.currentlyOpenAlbum.visits[
 																			visitIndex
 																		].date = new Date(
 																			v.target.value
@@ -204,7 +220,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 														value={visit.comment}
 														multiline
 														onChange={e =>
-															(this.props.album.visits[
+															(main.currentlyOpenAlbum.visits[
 																visitIndex
 															].comment =
 																e.target.value)
@@ -218,7 +234,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 													<td
 														key={type}
 														style={{
-															display: viewControl
+															display: albumView
 																.showGraphs[
 																typeIndex
 															]
@@ -231,7 +247,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 															<div
 																style={{
 																	width:
-																		viewControl.thumbnailSize,
+																		albumView.thumbnailSize,
 																	cursor:
 																		"pointer"
 																}}
@@ -274,12 +290,12 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 					{this.toCropSrc ? (
 						<CropImageModal
 							src={this.toCropSrc}
-							prevSrc={this.toCropPreviousSource}
+							prevSrc={this.toCropPreviousSource || ""}
 							onDismiss={() => {
 								this.toCropSrc = "";
 							}}
 							onSave={croppedSrc => {
-								this.props.album.visits[
+								main.currentlyOpenAlbum.visits[
 									this.toCropVisitIndex
 								].graphs[
 									this.toCropTypeIndex
@@ -355,13 +371,41 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 											>
 												<RemoveCircle />
 											</IconButton>
+											<IconButton
+												color={
+													this.overlay
+														? "secondary"
+														: "default"
+												}
+												onClick={() => {
+													this.overlay = !this
+														.overlay;
+												}}
+											>
+												<Layers />
+											</IconButton>
 										</div>
+										{this.toShowPrevGraph &&
+										this.overlay ? (
+											<GraphViewer
+												graph={this.toShowPrevGraph}
+												width="100%"
+												className="overlay-bottom"
+											/>
+										) : (
+											""
+										)}
 										<GraphViewer
+											className={
+												this.overlay
+													? "overlay-top"
+													: ""
+											}
 											graph={this.toShowGraph}
 											width={"100%"}
 											onClick={(x, y) => {
 												if (this.addingLine) {
-													this.props.album.visits[
+													main.currentlyOpenAlbum.visits[
 														this.toShowVisitIndex
 													].graphs[
 														this.toShowTypeIndex
@@ -373,7 +417,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 													return;
 												}
 
-												this.props.album.visits[
+												main.currentlyOpenAlbum.visits[
 													this.toShowVisitIndex
 												].graphs[
 													this.toShowTypeIndex
@@ -431,7 +475,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 																					padding: 0
 																				}}
 																				onClick={() => {
-																					this.props.album.visits[
+																					main.currentlyOpenAlbum.visits[
 																						this.toShowVisitIndex
 																					].graphs[
 																						this.toShowTypeIndex
@@ -451,7 +495,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 																	)}
 																	<IconButton
 																		onClick={() => {
-																			this.props.album.visits[
+																			main.currentlyOpenAlbum.visits[
 																				this.toShowVisitIndex
 																			].graphs[
 																				this.toShowTypeIndex
@@ -468,7 +512,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 																			padding: 0
 																		}}
 																		onClick={() => {
-																			this.props.album.visits[
+																			main.currentlyOpenAlbum.visits[
 																				this
 																					.toShowVisitIndex
 																			].graphs[
@@ -501,7 +545,7 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 											value={this.toShowGraph.comment}
 											multiline
 											onChange={e =>
-												(this.props.album.visits[
+												(main.currentlyOpenAlbum.visits[
 													this.toShowVisitIndex
 												].graphs[
 													this.toShowTypeIndex
@@ -515,21 +559,21 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 								<Button
 									color="secondary"
 									onClick={() => {
-										this.props.album.visits[
+										main.currentlyOpenAlbum.visits[
 											this.toShowVisitIndex
 										].graphs[this.toShowTypeIndex].source =
 											"";
-										this.props.album.visits[
+										main.currentlyOpenAlbum.visits[
 											this.toShowVisitIndex
 										].graphs[
 											this.toShowTypeIndex
 										].refIndex = 0;
-										this.props.album.visits[
+										main.currentlyOpenAlbum.visits[
 											this.toShowVisitIndex
 										].graphs[
 											this.toShowTypeIndex
 										].lines = [];
-										this.props.album.visits[
+										main.currentlyOpenAlbum.visits[
 											this.toShowVisitIndex
 										].graphs[this.toShowTypeIndex].comment =
 											"";
@@ -553,13 +597,21 @@ export class AlbumContents extends React.Component<{ album: Album }> {
 					color="primary"
 					className="add-visit-fab"
 					onClick={() => {
-						this.props.album.visits.push(new Visit());
+						main.currentlyOpenAlbum.visits.push(new Visit());
 					}}
 				>
 					<PlaylistAdd />
 				</Fab>
 			</div>
 		);
+	}
+
+	getPrevGraph(album: Album, visitIndex: number, typeIndex: number) {
+		const prevVisit = album.visits[visitIndex - 1];
+		if (!prevVisit) {
+			return undefined;
+		}
+		return prevVisit.graphs[typeIndex];
 	}
 }
 
@@ -569,6 +621,7 @@ export class GraphViewer extends React.Component<{
 	width: string | number;
 	onClick?: (x: number, y: number) => void;
 	onClickLine?: (lineIndex: number) => void;
+	className?: string;
 }> {
 	@observable id: string = `id-${Math.round(Math.random() * 1000)}`;
 
@@ -630,7 +683,9 @@ export class GraphViewer extends React.Component<{
 		return (
 			<div
 				id={this.id}
-				className="graph-viewer"
+				className={`graph-viewer ${
+					this.props.className ? this.props.className : ""
+				}`}
 				style={{ width: this.props.width }}
 				onClick={e => {
 					if (!this.rect || !this.props.onClick) {
@@ -664,7 +719,7 @@ export class GraphViewer extends React.Component<{
 						);
 					})}
 				</div>
-				{viewControl.mountPoints ? (
+				{albumView.mountPoints ? (
 					<div className="lines">
 						{this.lines.map((line, index) => {
 							return (
@@ -703,17 +758,17 @@ export class GraphViewer extends React.Component<{
 	}
 
 	componentDidMount() {
-		viewControl.updateLines();
+		albumView.updateLines();
 	}
 }
 
 @observer
-export class AlbumView extends React.Component<{ album: Album }> {
+export class AlbumView extends React.Component {
 	render() {
 		return (
 			<div className="album">
-				<AlbumHeader album={this.props.album} />
-				<AlbumContents album={this.props.album} />
+				<AlbumHeader />
+				<AlbumContents />
 			</div>
 		);
 	}
