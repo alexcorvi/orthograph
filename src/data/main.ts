@@ -157,12 +157,14 @@ class MainData {
 			xhr.onload = () => {
 				this.loading = false;
 				if (xhr.status === 200) {
-					const data = new Uint8Array(xhr.response).reduce(
+					const strData = new Uint8Array(xhr.response).reduce(
 						(data, byte) => data + String.fromCharCode(byte),
 						""
 					);
 					resolve(
-						new Album(JSON.parse(data.replace(/orthograph:/, "")))
+						new Album(
+							JSON.parse(strData.replace(/orthograph:/, ""))
+						)
 					);
 				} else {
 					reject(xhr.response);
