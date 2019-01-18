@@ -87,16 +87,15 @@ export class CropImageModal extends React.Component<{
 								| "panup"
 								| "pandown"
 								| "panright" = (a as any).additionalEvent;
-							if (type === "panleft") {
+							if (a.pointerType === "mouse") {
+								return;
+							} else if (type === "panleft") {
 								this.x = this.x + 0.01 / this.zoom;
-							}
-							if (type === "panright") {
+							} else if (type === "panright") {
 								this.x = this.x - 0.01 / this.zoom;
-							}
-							if (type === "panup") {
+							} else if (type === "panup") {
 								this.y = this.y + 0.01 / this.zoom;
-							}
-							if (type === "pandown") {
+							} else if (type === "pandown") {
 								this.y = this.y - 0.01 / this.zoom;
 							}
 						}}
@@ -114,7 +113,6 @@ export class CropImageModal extends React.Component<{
 								position={{ x: this.x, y: this.y }}
 								onPositionChange={
 									((p: { x: number; y: number }) => {
-										console.log(p);
 										this.x = p.x;
 										this.y = p.y;
 									}) as any
