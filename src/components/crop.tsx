@@ -230,7 +230,9 @@ export class CropImageModal extends React.Component<{
 							}
 
 							this.props.onSave(
-								this.editorRef.getImage().toDataURL()
+								this.editorRef
+									.getImageScaledToCanvas()
+									.toDataURL()
 							);
 							this.props.onDismiss();
 						}}
