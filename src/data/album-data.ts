@@ -43,7 +43,7 @@ interface VisitJSON {
 	graphs: GraphJSON[];
 }
 
-interface StepJSON {
+interface ListItemJSON {
 	title: string;
 	done: boolean;
 }
@@ -51,10 +51,11 @@ interface StepJSON {
 interface AlbumJSON {
 	_id: string;
 	title: string;
-	problemList: StepJSON[];
-	patientComplaint: StepJSON[];
-	treatmentPlan: StepJSON[];
+	problemList: ListItemJSON[];
+	patientComplaint: ListItemJSON[];
+	treatmentPlan: ListItemJSON[];
 	visits: VisitJSON[];
+	nextNotes: ListItemJSON[];
 }
 
 export class Line {
@@ -184,18 +185,18 @@ export class Visit {
 	}
 }
 
-export class Step {
+export class ListItem {
 	@observable title: string = "";
 	@observable done: boolean = false;
 
-	toJSON(): StepJSON {
+	toJSON(): ListItemJSON {
 		return {
 			title: this.title,
 			done: this.done
 		};
 	}
 
-	constructor(json: StepJSON) {
+	constructor(json: ListItemJSON) {
 		this.title = json.title;
 		this.done = json.done;
 	}
@@ -212,9 +213,10 @@ export class Album {
 			.replace(/[^a-z]/gi, "");
 
 	@observable title: string = "";
-	@observable problemList: Step[] = [];
-	@observable patientComplaint: Step[] = [];
-	@observable treatmentPlan: Step[] = [];
+	@observable problemList: ListItem[] = [];
+	@observable patientComplaint: ListItem[] = [];
+	@observable nextNotes: ListItem[] = [];
+	@observable treatmentPlan: ListItem[] = [];
 	@observable visits: Visit[] = [];
 
 	@computed get fileName() {
@@ -228,7 +230,8 @@ export class Album {
 			patientComplaint: this.patientComplaint.map(c => c.toJSON()),
 			treatmentPlan: this.treatmentPlan.map(t => t.toJSON()),
 			visits: this.visits.map(v => v.toJSON()),
-			_id: this._id
+			_id: this._id,
+			nextNotes: this.nextNotes
 		};
 	}
 
@@ -241,11 +244,14 @@ export class Album {
 	constructor(json?: AlbumJSON) {
 		if (json) {
 			this.title = json.title;
-			this.problemList = json.problemList.map(p => new Step(p));
-			this.patientComplaint = json.patientComplaint.map(c => new Step(c));
-			this.treatmentPlan = json.treatmentPlan.map(t => new Step(t));
+			this.problemList = json.problemList.map(p => new ListItem(p));
+			this.patientComplaint = json.patientComplaint.map(
+				c => new ListItem(c)
+			);
+			this.treatmentPlan = json.treatmentPlan.map(t => new ListItem(t));
 			this.visits = json.visits.map(v => new Visit(v));
 			this._id = json._id;
+			this.nextNotes = (json.nextNotes || []).map(i => new ListItem(i));
 		}
 	}
 }

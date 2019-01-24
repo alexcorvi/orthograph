@@ -8,7 +8,11 @@ import {
 	Save,
 	Close
 } from "@material-ui/icons";
-import { Album, graphTypes, Step } from "../data/album-data";
+import {
+	Album,
+	graphTypes,
+	ListItem as DataListItem
+} from "../data/album-data";
 import {
 	AppBar,
 	Button,
@@ -24,7 +28,8 @@ import {
 	Paper,
 	TextField,
 	Toolbar,
-	Typography
+	Typography,
+	Grid
 } from "@material-ui/core";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
@@ -38,6 +43,8 @@ export class AlbumHeader extends React.Component {
 
 	@observable compliantToAdd: string = "";
 
+	@observable noteToAdd: string = "";
+
 	@observable openDrawer: boolean = false;
 
 	addProblem() {
@@ -45,7 +52,7 @@ export class AlbumHeader extends React.Component {
 			return;
 		}
 		main.currentlyOpenAlbum.problemList.push(
-			new Step({ title: this.problemToAdd, done: false })
+			new DataListItem({ title: this.problemToAdd, done: false })
 		);
 		this.problemToAdd = "";
 	}
@@ -55,7 +62,7 @@ export class AlbumHeader extends React.Component {
 			return;
 		}
 		main.currentlyOpenAlbum.treatmentPlan.push(
-			new Step({ title: this.planToAdd, done: false })
+			new DataListItem({ title: this.planToAdd, done: false })
 		);
 		this.planToAdd = "";
 	}
@@ -65,14 +72,24 @@ export class AlbumHeader extends React.Component {
 			return;
 		}
 		main.currentlyOpenAlbum.patientComplaint.push(
-			new Step({ title: this.compliantToAdd, done: false })
+			new DataListItem({ title: this.compliantToAdd, done: false })
 		);
 		this.compliantToAdd = "";
 	}
 
+	addNote() {
+		if (!this.noteToAdd) {
+			return;
+		}
+		main.currentlyOpenAlbum.nextNotes.push(
+			new DataListItem({ title: this.noteToAdd, done: false })
+		);
+		this.noteToAdd = "";
+	}
+
 	render() {
 		return (
-			<div>
+			<div style={{ width: "100%", overflowX: "auto" }}>
 				<AppBar position="fixed">
 					<Toolbar>
 						<IconButton
@@ -393,6 +410,97 @@ export class AlbumHeader extends React.Component {
 																}}
 																onClick={() =>
 																	main.currentlyOpenAlbum.treatmentPlan.splice(
+																		index,
+																		1
+																	)
+																}
+															>
+																<Delete />
+															</IconButton>
+														</ListItemSecondaryAction>
+													</ListItem>
+												);
+											}
+										)}
+									</List>
+								</Paper>
+							</td>
+							<td>
+								<Paper style={{ padding: 15, marginTop: 7 }}>
+									<Typography variant="overline" gutterBottom>
+										Notes for next visit
+									</Typography>
+									<Divider />
+									<IconButton
+										style={{
+											marginRight: 10,
+											marginBottom: 5,
+											padding: 0
+										}}
+										onClick={() => {
+											this.addNote();
+										}}
+									>
+										<AddBoxOutlined />
+									</IconButton>
+									<InputBase
+										placeholder="Add note"
+										onChange={e => {
+											this.noteToAdd = e.target.value;
+										}}
+										onKeyPress={e => {
+											if (e.which === 13) {
+												this.addNote();
+											}
+										}}
+										value={this.noteToAdd}
+									/>
+
+									<Divider />
+									<List>
+										{main.currentlyOpenAlbum.nextNotes.map(
+											(note, index) => {
+												return (
+													<ListItem
+														key={index}
+														button
+														style={{
+															padding: 0
+														}}
+													>
+														<Checkbox
+															tabIndex={-1}
+															disableRipple
+															style={{
+																padding: 0
+															}}
+															onChange={e =>
+																(main.currentlyOpenAlbum.nextNotes[
+																	index
+																].done = e
+																	.target
+																	.checked
+																	? true
+																	: false)
+															}
+															checked={note.done}
+														/>
+														<InputBase
+															value={note.title}
+															onChange={e =>
+																(main.currentlyOpenAlbum.nextNotes[
+																	index
+																].title =
+																	e.target.value)
+															}
+														/>
+														<ListItemSecondaryAction>
+															<IconButton
+																style={{
+																	padding: 0
+																}}
+																onClick={() =>
+																	main.currentlyOpenAlbum.nextNotes.splice(
 																		index,
 																		1
 																	)
